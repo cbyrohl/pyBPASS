@@ -1,0 +1,23 @@
+import setuptools
+
+with open('README.md') as fh:
+    long_desc = fh.read()
+
+setuptools.setup(
+    name='pyBPASS',
+    version='0.1.dev0',
+    author_email='mglatzle@mpa-garching.mpg.de',
+    description='Python tools for BPASS data releases.',
+    long_description=long_desc,
+    long_description_content_type='text/markdown',
+    license='GPL-3.0',
+    packages=['pyBPASS'],
+    install_requires=[
+        'google-api-python-client',
+        'google-auth-httplib2',
+        'google-auth-oauthlib'
+    ],
+    tests_require=[
+        'pytest'
+    ],
+)
