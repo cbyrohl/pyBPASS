@@ -127,6 +127,7 @@ class BPASSsedDatabase(_BPASSdatabase):
             input stellar population at all wavelengths provided by the
             database.
         """
+        # clipping
         if _np.amax(metallicities) > self._zMax or \
            _np.amin(metallicities) < self._zMin:
             _warnings.warn(
@@ -143,6 +144,7 @@ class BPASSsedDatabase(_BPASSdatabase):
                 " provided. They will be clipped."
             )
             ages = _np.clip(ages, 10**self._aMin, 10**self._aMax)
+
         return self.wavelengths, \
             self._interpolator(metallicities, _np.log10(ages))
 
