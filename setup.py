@@ -13,9 +13,8 @@ setuptools.setup(
     license='GPL-3.0',
     packages=['pyBPASS'],
     install_requires=[
-        'google-api-python-client',
-        'google-auth-httplib2',
-        'google-auth-oauthlib'
+        'numpy',
+        'scipy'
     ],
     tests_require=[
         'pytest'
