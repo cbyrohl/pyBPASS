@@ -28,6 +28,12 @@ class TestBPASSsedDatabase(TestCase):
                 "bpass_v2.2.1_imf_chab300/spectra-bin-imf_chab300.z030.dat.gz"
             )
         )
+        cls.db_chab300_bin = spectral_synthesis.BPASSsedDatabase(
+            cls.path,
+            cls.version,
+            "chab300",
+            "bin"
+        )
         return
 
     @classmethod
@@ -35,12 +41,7 @@ class TestBPASSsedDatabase(TestCase):
         return
 
     def test_interpolate_clip(self):
-        db = spectral_synthesis.BPASSsedDatabase(
-            self.__class__.path,
-            self.__class__.version,
-            "chab300",
-            "bin"
-        )
+        db = self.__class__.db_chab300_bin
 
         # clip Z
         z = 1
@@ -71,12 +72,7 @@ class TestBPASSsedDatabase(TestCase):
         return
 
     def test_interpolate(self):
-        db = spectral_synthesis.BPASSsedDatabase(
-            self.__class__.path,
-            self.__class__.version,
-            "chab300",
-            "bin"
-        )
+        db = self.__class__.db_chab300_bin
 
         # at given grid point
         z = 0.040
