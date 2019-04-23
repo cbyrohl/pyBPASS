@@ -159,11 +159,3 @@ class BPASSsedDatabase(_BPASSdatabase):
 
         return self.wavelengths, \
             masses*self._interpolator(metallicities, _np.log10(ages))
-
-
-if __name__ == "__main__":
-    c = BPASSsedDatabase(
-        '/freya/u/mglatzle/data/BPASS/BPASSv2.2.1_release-07-18-Tuatara/',
-        '2.2.1',
-        'chab300',
-        'bin')
