@@ -14,7 +14,7 @@ setuptools.setup(
     packages=['pyBPASS'],
     install_requires=[
         'numpy',
-        'scipy'
+        'scipy',
     ],
     tests_require=[
         'pytest'

@@ -11,7 +11,6 @@ class BPASSdatabase(object):
         self.version = version
         return
 
-
     def _zFromFilename(self, fname):
         zStr = _re.search("\\.z(.{3})\\.", fname).group(1)
         try:

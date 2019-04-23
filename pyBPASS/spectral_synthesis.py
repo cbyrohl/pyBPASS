@@ -19,13 +19,16 @@ class BPASSsedDatabase(_BPASSdatabase):
         The population type of this SED grid. Can be single ('sin') or binary
         ('bin').
     metallicities : list
-        The metallicities at which BPASS provides SEDs for this population. In
-        units of Z_sun.
+        The metallicities at which BPASS provides SEDs for this
+        population. Given as the mass fraction in metals.
     log_ages : list
         Log of the population ages [yr] at which BPASS provides SEDs for this
         population.
     wavelengths : array
         The wavelengths [angstrom] at which the SEDs are sampled.
+    SEDgrid : array
+        Array of fluxes [L_sun/angstrom] provided by BPASS as a function of
+        metallicity, age and wavelength.
     """
 
     def __init__(self, path, version, imf, popType):
@@ -49,7 +52,7 @@ class BPASSsedDatabase(_BPASSdatabase):
         """
         Load all available SEDs into memory.
 
-        Builds a 3D array of flux in L_sun/angstrom as function of
+        Builds a 3D array of flux [L_sun/angstrom] as function of
         (Z,age,lambda) for a simple stellar population of 1e6 M_sun.
         """
         reg = \
@@ -88,7 +91,7 @@ class BPASSsedDatabase(_BPASSdatabase):
 
     def _constructInterpolator(self):
         """
-        Construction an interpolator on metallicity-age grid. Use
+        Construct an interpolator on metallicity-age grid. Use
         `LinearNDInterpolator` because it can interpolate vector-valued
         quantities.
         """
@@ -99,13 +102,13 @@ class BPASSsedDatabase(_BPASSdatabase):
         )
         return
 
-    def interpolate(self, metallicities, ages):
+    def interpolate(self, metallicities, ages, masses=1):
         """
         Interpolate spectra for stellar populations.
 
         The units of the returned SEDs are Solar Luminosities per
         Angstrom. Computes SEDs for stellar populations formed in single
-        instantaneous bursts. Normalised to a population mass of 1e6 M_sun.
+        instantaneous bursts.
 
         Interpolation is done in metallicity-log(age) space by triangulation
         and subsequent barycentric interpolation.
@@ -113,10 +116,12 @@ class BPASSsedDatabase(_BPASSdatabase):
         Parameters
         ----------
         metallicities : array, shape `(N)`
-            The metallicities of the stellar populations in units of solar
-            metallicity.
+            The metallicities of the stellar populations given as the mass
+            fractions in metals.
         ages : array, shape `(N)`
             The ages of the stellar populations [yr].
+        masses : optional, array, shape `(N)` or float
+            The masses of the stellar populations [1e6 M_sun].
 
         Returns
         -------
@@ -144,9 +149,16 @@ class BPASSsedDatabase(_BPASSdatabase):
                 " provided. They will be clipped."
             )
             ages = _np.clip(ages, 10**self._aMin, 10**self._aMax)
+        if _np.amin(masses) < 1e-3:
+            _warnings.warn(
+                "Input masses below 1000 M_sun! For such small populations,"
+                " single stars can contribute a significant fraction of the"
+                " population mass and re-scaling BPASS spectra averaged over"
+                " more massive populations likely yields incorrect results."
+            )
 
         return self.wavelengths, \
-            self._interpolator(metallicities, _np.log10(ages))
+            masses*self._interpolator(metallicities, _np.log10(ages))
 
 
 if __name__ == "__main__":
