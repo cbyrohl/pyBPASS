@@ -5,6 +5,7 @@ data releases it is supposed to work with.
 
 from unittest import TestCase
 from .. import spectral_synthesis
+from . import config
 import numpy as np
 import os
 
@@ -13,8 +14,7 @@ class TestBPASSsedDatabase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.path = \
-            '/freya/u/mglatzle/data/BPASS/BPASSv2.2.1_release-07-18-Tuatara/'
+        cls.path = config.BPASSpath
         cls.version = "2.2.1"
         cls.bin_chab300_z040 = np.loadtxt(
             os.path.join(
