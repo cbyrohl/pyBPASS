@@ -152,7 +152,7 @@ class BPASSsedDatabase(_BPASSdatabase):
             _warnings.warn(
                 "Input ages for spectral synthesis outside of available "
                 "range "+str(10**self._aMin)+", "+str(10**self._aMax) +
-                " provided. They will be clipped."
+                " [yr] provided. They will be clipped."
             )
             ages = _np.clip(ages, 10**self._aMin, 10**self._aMax)
         if _np.amin(masses) < 1e-3:
