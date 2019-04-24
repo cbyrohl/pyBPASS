@@ -132,6 +132,12 @@ class BPASSsedDatabase(_BPASSdatabase):
             input stellar population at all wavelengths provided by the
             database.
         """
+        # argument checking
+        try:
+            masses = masses[:, None]
+        except TypeError as e:
+            if 'not subscriptable' not in str(e):
+                raise
         # clipping
         if _np.amax(metallicities) > self._zMax or \
            _np.amin(metallicities) < self._zMin:
@@ -156,6 +162,5 @@ class BPASSsedDatabase(_BPASSdatabase):
                 " population mass and re-scaling BPASS spectra averaged over"
                 " more massive populations likely yields incorrect results."
             )
-
         return self.wavelengths, \
-            masses*self._interpolator(metallicities, _np.log10(ages))
+            self._interpolator(metallicities, _np.log10(ages))*masses
