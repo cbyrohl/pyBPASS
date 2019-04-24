@@ -135,3 +135,69 @@ class TestBPASSsedDatabase(TestCase):
             )
         )
         return
+
+    def test_interpolate_array(self):
+        db = self.__class__.db_chab300_bin
+
+        z = np.array([0.040, 0.035])
+        age = np.array([1e6, 1e6])
+        lam, sed = db.interpolate(z, age)
+        self.assertTrue(
+            np.all(lam == self.__class__.bin_chab300_z040[:, 0])
+        )
+        self.assertTrue(
+            np.allclose(sed[0, :],
+                        self.__class__.bin_chab300_z040[:, 1],
+                        atol=0.0)
+        )
+        self.assertTrue(
+            np.allclose(
+                sed[1, :],
+                0.5*(self.__class__.bin_chab300_z030[:, 1] +
+                     self.__class__.bin_chab300_z040[:, 1]),
+                atol=0.0
+            )
+        )
+        return
+
+    def test_interpolate_with_mass(self):
+        db = self.__class__.db_chab300_bin
+
+        z = 0.040
+        age = 1e6
+        mass = 1e2/1e6
+        with self.assertWarns(UserWarning):
+            lam, sed = db.interpolate(z, age, masses=mass)
+        self.assertTrue(
+            np.all(lam == self.__class__.bin_chab300_z040[:, 0])
+        )
+        self.assertTrue(
+            np.allclose(sed,
+                        mass*self.__class__.bin_chab300_z040[:, 1], atol=0.0)
+        )
+        return
+
+    def test_interpolate_with_mass_array(self):
+        db = self.__class__.db_chab300_bin
+
+        z = np.array([0.040, 0.035])
+        age = np.array([1e6, 1e6])
+        mass = np.array([1, 1e3])
+        lam, sed = db.interpolate(z, age, masses=mass)
+        self.assertTrue(
+            np.all(lam == self.__class__.bin_chab300_z040[:, 0])
+        )
+        self.assertTrue(
+            np.allclose(sed[0, :],
+                        mass[0]*self.__class__.bin_chab300_z040[:, 1],
+                        atol=0.0)
+        )
+        self.assertTrue(
+            np.allclose(
+                sed[1, :],
+                mass[1]*0.5*(self.__class__.bin_chab300_z030[:, 1] +
+                             self.__class__.bin_chab300_z040[:, 1]),
+                atol=0.0
+            )
+        )
+        return
