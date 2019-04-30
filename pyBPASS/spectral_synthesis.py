@@ -73,10 +73,10 @@ class BPASSsedDatabase(_BPASSdatabase):
         flist.sort(
             key=lambda x: self._zFromFilename(_os.path.basename(x))
         )
-        self.metallicities = [
+        self.metallicities = _np.array([
             self._zFromFilename(_os.path.basename(x)) for x in flist
-        ]
-        if not sorted(self.metallicities):
+        ])
+        if _np.any(_np.diff(self.metallicities) <= 0):
             raise RuntimeError(
                 "Sorting available tables by metallicity failed! "
                 "Found the following values: "+str(self.metallicities))
@@ -85,7 +85,9 @@ class BPASSsedDatabase(_BPASSdatabase):
 
         fArr = _np.loadtxt(flist[0])
         self.wavelengths = fArr[:, 0]
-        self.log_ages = [(6+0.1*(n-2)) for n in range(2, fArr.shape[1]+1)]
+        self.log_ages = _np.array([
+            (6+0.1*(n-2)) for n in range(2, fArr.shape[1]+1)
+        ])
         self._aMin = self.log_ages[0]
         self._aMax = self.log_ages[-1]
 
