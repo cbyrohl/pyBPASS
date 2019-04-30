@@ -8,7 +8,7 @@ from pyBPASS.database import BPASSdatabase as _BPASSdatabase
 
 class BPASSsedDatabase(_BPASSdatabase):
     """
-    Representation and interface for single BPASS SED grid defined by an IMF
+    Representation of and interface for single BPASS SED grid defined by an IMF
     and a population type.
 
     Attributes
@@ -40,7 +40,7 @@ class BPASSsedDatabase(_BPASSdatabase):
             else 'bpass_v'+self.version+'_imf_'+imf
         if not _os.path.isdir(_os.path.join(self.path, self.folder)):
             raise ValueError(_os.path.join(self.path, self.folder) +
-                             "is not a directory.")
+                             " is not a directory.")
 
         self.imf = imf
         self.popType = popType
@@ -106,7 +106,7 @@ class BPASSsedDatabase(_BPASSdatabase):
         """
         Interpolate spectra for stellar populations.
 
-        The units of the returned SEDs are Solar Luminosities per
+        The units of the returned SEDs are Solar luminosities per
         Angstrom. Computes SEDs for stellar populations formed in single
         instantaneous bursts.
 
@@ -134,6 +134,7 @@ class BPASSsedDatabase(_BPASSdatabase):
         """
         # argument checking
         try:
+            # to be able to multiply array of interpolated spectra by it
             masses = masses[:, None]
         except TypeError as e:
             if 'not subscriptable' not in str(e):
