@@ -127,10 +127,10 @@ class BPASSsedDatabase(_BPASSdatabase):
 
         Parameters
         ----------
-        metallicities : array, shape `(N)`
+        metallicities : array, shape `(N)` or float
             The metallicities of the stellar populations given as the mass
             fractions in metals.
-        ages : array, shape `(N)`
+        ages : array, shape `(N)` or float
             The ages of the stellar populations [yr].
         masses : optional, array, shape `(N)` or float
             The masses of the stellar populations [1e6 M_sun].
