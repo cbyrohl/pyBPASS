@@ -5,6 +5,12 @@ import numpy as _np
 from scipy import interpolate as _interpolate
 from pyBPASS.database import BPASSdatabase as _BPASSdatabase
 
+_constants = {
+    '2.2.1': {
+        'L_sun': 3.848e26
+    }
+}
+
 
 class BPASSsedDatabase(_BPASSdatabase):
     """
@@ -29,6 +35,9 @@ class BPASSsedDatabase(_BPASSdatabase):
     SEDgrid : array
         Array of fluxes [L_sun/angstrom] provided by BPASS as a function of
         metallicity, age and wavelength.
+    Lsun : float
+        The solar luminosity value [J/s] assumed in the BPASS version an
+        instance of this class corresponds to.
     """
 
     def __init__(self, path, version, imf, popType):
@@ -44,6 +53,7 @@ class BPASSsedDatabase(_BPASSdatabase):
 
         self.imf = imf
         self.popType = popType
+        self.Lsun = _constants[self.version]['L_sun']
         self._constructGrid()
         self._constructInterpolator()
         return
