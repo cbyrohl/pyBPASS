@@ -17,6 +17,20 @@ class BPASSsedDatabase(_BPASSdatabase):
     Representation of and interface for single BPASS SED grid defined by an IMF
     and a population type.
 
+    Parameters
+    ----------
+    path : string
+        Path to BPASS data release.
+    version : string
+        Version of the BPASS data release.
+    imf : string
+        Which stellar initial mass function to use.
+    popType : string
+        The population type to use.
+    dbdtype : dtype, optional
+        Data type to use for arrays read from disk. Defaults to numpy's
+        float64.
+
     Attributes
     ----------
     imf : string
@@ -40,7 +54,7 @@ class BPASSsedDatabase(_BPASSdatabase):
         instance of this class corresponds to.
     """
 
-    def __init__(self, path, version, imf, popType):
+    def __init__(self, path, version, imf, popType, dbdtype=_np.float64):
         super().__init__(path, version)
 
         # IMF specific subfolder of BPASS data release
@@ -54,11 +68,11 @@ class BPASSsedDatabase(_BPASSdatabase):
         self.imf = imf
         self.popType = popType
         self.Lsun = _constants[self.version]['L_sun']
-        self._constructGrid()
+        self._constructGrid(dbdtype)
         self._constructInterpolator()
         return
 
-    def _constructGrid(self):
+    def _constructGrid(self, dbdtype):
         """
         Load all available SEDs into memory.
 
@@ -75,7 +89,7 @@ class BPASSsedDatabase(_BPASSdatabase):
         )
         self.metallicities = _np.array([
             self._zFromFilename(_os.path.basename(x)) for x in flist
-        ])
+        ], dtype=dbdtype)
         if _np.any(_np.diff(self.metallicities) <= 0):
             raise RuntimeError(
                 "Sorting available tables by metallicity failed! "
@@ -83,22 +97,23 @@ class BPASSsedDatabase(_BPASSdatabase):
         self._zMin = self.metallicities[0]
         self._zMax = self.metallicities[-1]
 
-        fArr = _np.loadtxt(flist[0])
+        fArr = _np.loadtxt(flist[0], dtype=dbdtype)
         self.wavelengths = fArr[:, 0]
         self.log_ages = _np.array([
             (6+0.1*(n-2)) for n in range(2, fArr.shape[1]+1)
-        ])
+        ], dtype=dbdtype)
         self._aMin = self.log_ages[0]
         self._aMax = self.log_ages[-1]
 
-        self.SEDgrid = _np.zeros(
+        self.SEDgrid = _np.empty(
             (len(self.metallicities),
              len(self.log_ages),
-             len(self.wavelengths))
+             len(self.wavelengths)),
+            dtype=dbdtype
         )
         self.SEDgrid[0, :, :] = fArr[:, 1:].T
         for j, f in enumerate(flist[1:]):
-            self.SEDgrid[j+1, :, :] = _np.loadtxt(f)[:, 1:].T
+            self.SEDgrid[j+1, :, :] = _np.loadtxt(f, dtype=dbdtype)[:, 1:].T
         return
 
     def _constructInterpolator(self):
@@ -159,7 +174,11 @@ class BPASSsedDatabase(_BPASSdatabase):
                 "available range "+str(self._zMin)+", "+str(self._zMax) +
                 " provided. They will be clipped."
             )
-            metallicities = _np.clip(metallicities, self._zMin, self._zMax)
+            # need to do a copy and cast here
+            metallicities = _np.array(
+                metallicities, dtype=self.metallicities.dtype
+            )
+            _np.clip(metallicities, self._zMin, self._zMax, out=metallicities)
         if _np.amax(ages) > 10**(self._aMax) or \
            _np.amin(ages) < 10**(self._aMin):
             _warnings.warn(
@@ -167,7 +186,11 @@ class BPASSsedDatabase(_BPASSdatabase):
                 "range "+str(10**self._aMin)+", "+str(10**self._aMax) +
                 " [yr] provided. They will be clipped."
             )
-            ages = _np.clip(ages, 10**self._aMin, 10**self._aMax)
+            # need to do a copy and cast here
+            ages = _np.array(
+                ages, dtype=self.log_ages.dtype
+            )
+            _np.clip(ages, 10**self._aMin, 10**self._aMax, out=ages)
         if _np.amin(masses) < 1e-3:
             _warnings.warn(
                 "Input masses below 1000 M_sun! For such small populations,"
