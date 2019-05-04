@@ -6,10 +6,12 @@ data releases it is supposed to work with.
 from unittest import TestCase
 from .. import spectral_synthesis
 from . import config
+from ddt import ddt, data, unpack
 import numpy as np
 import os
 
 
+@ddt
 class TestBPASSsedDatabase(TestCase):
 
     @classmethod
@@ -201,3 +203,54 @@ class TestBPASSsedDatabase(TestCase):
             )
         )
         return
+
+    @data(
+        1.0645117e-09,
+        8.359301e-10,
+        8.000402e-10,
+    )
+    def test_nan_spectra(self, Z):
+        """
+        Some of the values for Z used here produced NaN spectra in early versions
+        when not much attention was paid to data types.
+        """
+        db = self.__class__.db_chab300_bin
+
+        age = 1e7
+        M = 1e6
+        Z = np.array(Z, dtype=np.float32)
+
+        with self.assertWarns(UserWarning) as cm:
+            lam, sed = db.interpolate(Z, age, masses=M)
+        self.assertEqual(
+            len(cm.warnings), 1
+        )
+        self.assertTrue(
+            'Input metallicities for spectral synthesis outside of available'
+            in str(cm.warnings[0].message)
+        )
+        self.assertFalse(
+            np.any(np.isnan(sed))
+        )
+
+        return
+
+    @unpack
+    @data(
+        (2e-5, 1e6),
+        (0.04, 1e11),
+        (1e-3, 1e8)
+    )
+    def test_float32(self, Z, age):
+        db = self.__class__.db_chab300_bin
+
+        age = np.array(age, dtype=np.float32)
+        z = np.array(Z, dtype=np.float32)
+
+        lam, sed = db.interpolate(z, age)
+        self.assertFalse(
+            np.any(np.isnan(sed))
+        )
+        return
+
+
