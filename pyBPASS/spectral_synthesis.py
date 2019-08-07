@@ -30,6 +30,14 @@ class BPASSsedDatabase(_BPASSdatabase):
     dbdtype : dtype, optional
         Data type to use for arrays read from disk. Defaults to numpy's
         float64.
+    lam_min : float, optional
+        Minimum wavelength [angstrom] of the interpolated spectra. Defaults to
+        None, in which case the minimum available wavelength in the database
+        will be taken.
+    lam_max : float, optional
+        Maximum wavelength [angstrom] of the interpolated spectra. Defaults to
+        None, in which case the maximum available wavelength in the database
+        will be taken.
 
     Attributes
     ----------
@@ -54,7 +62,8 @@ class BPASSsedDatabase(_BPASSdatabase):
         instance of this class corresponds to.
     """
 
-    def __init__(self, path, version, imf, popType, dbdtype=_np.float64):
+    def __init__(self, path, version, imf, popType, dbdtype=_np.float64,
+                 lam_min=None, lam_max=None):
         super().__init__(path, version)
 
         # IMF specific subfolder of BPASS data release
@@ -68,21 +77,24 @@ class BPASSsedDatabase(_BPASSdatabase):
         self.imf = imf
         self.popType = popType
         self.Lsun = _constants[self.version]['L_sun']
-        self._constructGrid(dbdtype)
+        self._constructGrid(dbdtype, lam_min, lam_max)
         self._constructInterpolator()
         return
 
-    def _constructGrid(self, dbdtype):
+    def _constructGrid(self, dbdtype, lam_min, lam_max):
         """
         Load all available SEDs into memory.
 
         Builds a 3D array of flux [L_sun/angstrom] as function of
         (Z,age,lambda) for a simple stellar population of 1e6 M_sun.
         """
+        # wildcarded filename to glob for
         reg = \
             "spectra-"+self.popType+"-imf"+self.imf+"*" \
             if not self.imf[0].isalpha() \
             else "spectra-"+self.popType+"-imf_"+self.imf+"*"
+
+        # list of files that comprise our database
         flist = _glob.glob(_os.path.join(self.path, self.folder, reg))
         flist.sort(
             key=lambda x: self._zFromFilename(_os.path.basename(x))
@@ -97,23 +109,39 @@ class BPASSsedDatabase(_BPASSdatabase):
         self._zMin = self.metallicities[0]
         self._zMax = self.metallicities[-1]
 
+        # load first file to extract some info
         fArr = _np.loadtxt(flist[0], dtype=dbdtype)
-        self.wavelengths = fArr[:, 0]
+
+        wavelengths = fArr[:, 0]
+        if lam_min is not None:
+            idx_min = _np.searchsorted(wavelengths, lam_min, side='left')
+        else:
+            idx_min = None
+        if lam_max is not None:
+            idx_max = _np.searchsorted(wavelengths, lam_max, side='right')
+        else:
+            idx_max = None
+        self.wavelengths = fArr[:, 0][idx_min:idx_max]
         self.log_ages = _np.array([
             (6+0.1*(n-2)) for n in range(2, fArr.shape[1]+1)
         ], dtype=dbdtype)
         self._aMin = self.log_ages[0]
         self._aMax = self.log_ages[-1]
 
+        # can now allocate the actual grid
         self.SEDgrid = _np.empty(
             (len(self.metallicities),
              len(self.log_ages),
              len(self.wavelengths)),
             dtype=dbdtype
         )
-        self.SEDgrid[0, :, :] = fArr[:, 1:].T
+
+        # already have the first file loaded
+        self.SEDgrid[0, :, :] = fArr[idx_min:idx_max, 1:].T
+        # load the rest
         for j, f in enumerate(flist[1:]):
-            self.SEDgrid[j+1, :, :] = _np.loadtxt(f, dtype=dbdtype)[:, 1:].T
+            self.SEDgrid[j+1, :, :] = \
+                _np.loadtxt(f, dtype=dbdtype)[idx_min:idx_max, 1:].T
         return
 
     def _constructInterpolator(self):

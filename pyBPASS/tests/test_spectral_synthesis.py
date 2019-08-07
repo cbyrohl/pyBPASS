@@ -9,6 +9,7 @@ from . import config
 from ddt import ddt, data, unpack
 import numpy as np
 import os
+import astropy.units as u
 
 
 @ddt
@@ -35,6 +36,21 @@ class TestBPASSsedDatabase(TestCase):
             cls.version,
             "chab300",
             "bin"
+        )
+
+        cls.lam_min = (
+            (200*u.eV).to(u.angstrom, equivalencies=u.spectral())
+        ).value
+        cls.lam_max = (
+            (13.6*u.eV).to(u.angstrom, equivalencies=u.spectral())
+        ).value
+        cls.db_chab300_bin_lam_cut = spectral_synthesis.BPASSsedDatabase(
+            cls.path,
+            cls.version,
+            "chab300",
+            "bin",
+            lam_min=cls.lam_min,
+            lam_max=cls.lam_max
         )
         return
 
@@ -211,8 +227,8 @@ class TestBPASSsedDatabase(TestCase):
     )
     def test_nan_spectra(self, Z):
         """
-        Some of the values for Z used here produced NaN spectra in early versions
-        when not much attention was paid to data types.
+        Some of the values for Z used here produced NaN spectra in early
+        versions when not much attention was paid to data types.
         """
         db = self.__class__.db_chab300_bin
 
@@ -253,4 +269,23 @@ class TestBPASSsedDatabase(TestCase):
         )
         return
 
+    def test_lam_cut(self):
+        db = self.__class__.db_chab300_bin
+        db_cut = self.__class__.db_chab300_bin_lam_cut
 
+        # at given grid point
+        z = 0.040
+        age = 1e6
+        lam, sed = db.interpolate(z, age)
+        lam_cut, sed_cut = db_cut.interpolate(z, age)
+        idx = np.where(
+            (lam >= self.__class__.lam_min) &
+            (lam <= self.__class__.lam_max)
+        )
+        self.assertTrue(
+            np.all(lam[idx] == lam_cut)
+        )
+        self.assertTrue(
+            np.allclose(sed[idx], sed_cut, atol=0.0)
+        )
+        return
