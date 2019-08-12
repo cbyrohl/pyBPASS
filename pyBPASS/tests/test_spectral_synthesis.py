@@ -289,3 +289,50 @@ class TestBPASSsedDatabase(TestCase):
             np.allclose(sed[idx], sed_cut, atol=0.0)
         )
         return
+
+
+class TestBPASSionRatesDatabase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.path = config.BPASSpath
+        cls.version = "2.2.1"
+        cls.db_chab300_bin = spectral_synthesis.BPASSionRatesDatabase(
+            cls.path,
+            cls.version,
+            "chab300",
+            "bin"
+        )
+        cls.bin_chab300_z040 = np.loadtxt(
+            os.path.join(
+                cls.path,
+                "bpass_v2.2.1_imf_chab300/ionizing-bin-imf_chab300.z040.dat.gz"
+            )
+        )
+        cls.bin_chab300_z030 = np.loadtxt(
+            os.path.join(
+                cls.path,
+                "bpass_v2.2.1_imf_chab300/ionizing-bin-imf_chab300.z030.dat.gz"
+            )
+        )
+
+    def test_interpolate_array(self):
+        db = self.__class__.db_chab300_bin
+
+        z = np.array([0.040, 0.035])
+        age = np.array([1e6, 1e6])
+        res = db.interpolate(z, age)
+        self.assertEqual(
+            (2, 4), res.shape
+        )
+        return
+
+    def test_interpolate(self):
+        db = self.__class__.db_chab300_bin
+
+        # at given grid point
+        z = 0.040
+        age = 1e6
+        res = db.interpolate(z, age)
+        self.assertTrue(
+            np.allclose(res, self.__class__.bin_chab300_z040[0, 1:], atol=0.0)
+        )
