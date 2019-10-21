@@ -5,7 +5,7 @@ with open('README.md') as fh:
 
 setuptools.setup(
     name='pyBPASS',
-    version='0.1.dev2',
+    version='1.0.0',
     author_email='mglatzle@mpa-garching.mpg.de',
     description='Python tools for BPASS data releases.',
     long_description=long_desc,
