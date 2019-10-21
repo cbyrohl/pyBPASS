@@ -314,6 +314,12 @@ class TestBPASSionRatesDatabase(TestCase):
                 "bpass_v2.2.1_imf_chab300/ionizing-bin-imf_chab300.z030.dat.gz"
             )
         )
+        cls.bin_chab300_z020 = np.loadtxt(
+            os.path.join(
+                cls.path,
+                "bpass_v2.2.1_imf_chab300/ionizing-bin-imf_chab300.z020.dat.gz"
+            )
+        )
 
     def test_interpolate_array(self):
         db = self.__class__.db_chab300_bin
@@ -334,5 +340,72 @@ class TestBPASSionRatesDatabase(TestCase):
         age = 1e6
         res = db.interpolate(z, age)
         self.assertTrue(
-            np.allclose(res, self.__class__.bin_chab300_z040[0, 1:], atol=0.0)
+            np.allclose(
+                res,
+                10**(self.__class__.bin_chab300_z040[0, 1:]), atol=0.0)
         )
+
+        # between two points in Z
+        z = 0.035
+        age = 1e6
+        res = db.interpolate(z, age)
+        self.assertTrue(
+            np.allclose(
+                res,
+                10**(
+                    0.5*(self.__class__.bin_chab300_z030[0, 1:] +
+                         self.__class__.bin_chab300_z040[0, 1:])
+                ),
+                atol=0.0
+            )
+        )
+
+        # between two points in age
+        z = 0.030
+        age = 10**6.05
+        res = db.interpolate(z, age)
+        self.assertTrue(
+            np.allclose(
+                res,
+                10**(
+                    0.5*(self.__class__.bin_chab300_z030[0, 1:] +
+                         self.__class__.bin_chab300_z030[1, 1:])
+                ),
+                atol=0.0
+            )
+        )
+
+        # between four points
+        z = 0.035
+        age = 10**6.05
+        res = db.interpolate(z, age)
+        self.assertTrue(
+            np.allclose(
+                res,
+                10**(
+                    0.5*(
+                        self.__class__.bin_chab300_z040[0, 1:] +
+                        self.__class__.bin_chab300_z030[1, 1:]
+                    )
+                ),
+                atol=0.0
+            )
+        )
+
+        # between four points
+        z = 0.025
+        age = 10**6.15
+        res = db.interpolate(z, age)
+        self.assertTrue(
+            np.allclose(
+                res,
+                10**(
+                    0.5*(
+                        self.__class__.bin_chab300_z020[1, 1:] +
+                        self.__class__.bin_chab300_z030[2, 1:]
+                    )
+                ),
+                atol=0.0
+            )
+        )
+        return

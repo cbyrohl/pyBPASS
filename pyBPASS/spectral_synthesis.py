@@ -161,13 +161,13 @@ class BPASSionRatesDatabase(_BPASSdatabase):
         Interpolate ionizing photon rates for stellar populations.
 
         Computes:
-            log(Nion):
+            Nion in 1/s:
                 ionizing photon production rate
-            log(L_alpha in ergs/s):
+            L_alpha in ergs/s:
                 Balmer H line luminosity, assuming =log(Nion/s)-11.87
-            log (L_FUV in ergs/s/A):
+            L_FUV in ergs/s/A:
                 luminosity in the FUV band (mean flux from 1556 to 1576A)
-            log (L_NUV in ergs/s/A):
+            L_NUV in ergs/s/A:
                 luminosity in the NUV band (mean flux from 2257 to 2277A)
 
         Interpolation is done in metallicity-log(age) space by triangulation
@@ -186,7 +186,13 @@ class BPASSionRatesDatabase(_BPASSdatabase):
         Returns
         -------
          : array, shape `(N, 4)`
-            Interpolated values as specified above and normalized to 1e6 M_sun
-            for each input stellar population.
+            Interpolated values as specified above for each input stellar
+            population.
         """
-        return self._interpolate(metallicities, ages, masses)
+        try:
+            # to be able to multiply array of interpolated values by it
+            masses = masses[:, None]
+        except TypeError as e:
+            if 'not subscriptable' not in str(e):
+                raise
+        return masses*10**(self._interpolate(metallicities, ages, 1))
