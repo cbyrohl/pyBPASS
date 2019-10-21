@@ -126,8 +126,7 @@ class BPASSsedDatabase(_BPASSdatabase):
 
 
 class BPASSionRatesDatabase(_BPASSdatabase):
-    def __init__(self, path, version, imf, popType, dbdtype=_np.float64,
-                 lam_min=None, lam_max=None):
+    def __init__(self, path, version, imf, popType, dbdtype=_np.float64):
         super().__init__(path, version, imf, popType, "ionizing", dbdtype)
         self._constructGrid(dbdtype)
         self._constructInterpolator()
