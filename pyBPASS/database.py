@@ -96,7 +96,7 @@ class BPASSdatabase(object):
     def _interpolate(self, metallicities, ages, masses=1):
         # argument checking
         try:
-            # to be able to multiply array of interpolated spectra by it
+            # to be able to multiply array of interpolated values by it
             masses = masses[:, None]
         except TypeError as e:
             if 'not subscriptable' not in str(e):
