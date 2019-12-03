@@ -43,6 +43,8 @@ class BPASSsedDatabase(_BPASSdatabase):
     """
     def __init__(self, path, version, imf, popType, dbdtype=_np.float64,
                  lam_min=None, lam_max=None):
+        if lam_min > lam_max:
+            raise ValueError("lam_min is larger than lam_max!")
         super().__init__(path, version, imf, popType, "spectra", dbdtype)
         self.Lsun = _constants[self.version]['L_sun']
         self._constructGrid(dbdtype, lam_min, lam_max)
