@@ -10,28 +10,11 @@ _constants = {
 
 class BPASSsedDatabase(_BPASSdatabase):
     """
-    Representation of and interface for single BPASS SED grid defined by an IMF
-    and a population type.
-
-    Parameters
-    ----------
-    dbdtype : dtype, optional
-        Data type to use for arrays read from disk. Defaults to numpy's
-        float64.
-    lam_min : float, optional
-        Minimum wavelength [angstrom] of the interpolated spectra. Defaults to
-        None, in which case the minimum available wavelength in the database
-        will be taken.
-    lam_max : float, optional
-        Maximum wavelength [angstrom] of the interpolated spectra. Defaults to
-        None, in which case the maximum available wavelength in the database
-        will be taken.
+    This class models a database for the SEDs as a function of metallicity and
+    age of stellar populations for fixed IMF and population type.
 
     Attributes
     ----------
-    log_ages : list
-        Log of the population ages [yr] at which BPASS provides SEDs for this
-        population.
     wavelengths : array
         The wavelengths [angstrom] at which the SEDs are sampled.
     SEDgrid : array
@@ -41,14 +24,38 @@ class BPASSsedDatabase(_BPASSdatabase):
         The solar luminosity value [J/s] assumed in the BPASS version an
         instance of this class corresponds to.
     """
-    def __init__(self, path, version, imf, popType, dbdtype=_np.float64,
+    def __init__(self, basepath, version, imf, popType, dbdtype=_np.float64,
                  lam_min=None, lam_max=None):
-        if lam_min > lam_max:
-            raise ValueError("lam_min is larger than lam_max!")
-        super().__init__(path, version, imf, popType, "spectra", dbdtype)
+        """
+        Parameters
+        ----------
+        lam_min : float, optional
+            Minimum wavelength [angstrom] of the interpolated spectra. Defaults
+            to None, in which case the minimum available wavelength in the
+            database will be taken.
+        lam_max : float, optional
+            Maximum wavelength [angstrom] of the interpolated spectra. Defaults
+            to None, in which case the maximum available wavelength in the
+            database will be taken.
+        """
+        if lam_min is not None and lam_max is not None:
+            if lam_min > lam_max:
+                raise ValueError("lam_min is larger than lam_max!")
+        super().__init__(basepath, version, imf, popType, "spectra", dbdtype)
         self.Lsun = _constants[self.version]['L_sun']
         self._constructGrid(dbdtype, lam_min, lam_max)
         self._constructInterpolator()
+        return
+
+    def _constructAges(self):
+        first_row = _np.loadtxt(self.flist[0], max_rows=1)
+
+        # compute ages that rows correspond to according to BPASS v2.2.1 manual
+        self.log_ages = _np.array([
+            (6+0.1*(n-2)) for n in range(2, first_row.shape[0]+1)
+        ], dtype=self.dbdtype)
+        self._aMin = self.log_ages[0]
+        self._aMax = self.log_ages[-1]
         return
 
     def _constructGrid(self, dbdtype, lam_min, lam_max):
@@ -72,11 +79,6 @@ class BPASSsedDatabase(_BPASSdatabase):
         else:
             idx_max = None
         self.wavelengths = fArr[:, 0][idx_min:idx_max]
-        self.log_ages = _np.array([
-            (6+0.1*(n-2)) for n in range(2, fArr.shape[1]+1)
-        ], dtype=dbdtype)
-        self._aMin = self.log_ages[0]
-        self._aMax = self.log_ages[-1]
 
         # can now allocate the actual grid
         self.grid = _np.empty(
@@ -128,19 +130,35 @@ class BPASSsedDatabase(_BPASSdatabase):
 
 
 class BPASSionRatesDatabase(_BPASSdatabase):
+    """
+    This class models a database for different emissivities as a function of
+    metallicity and age of stellar populations for fixed IMF and population
+    type.
+
+    Attributes
+    ----------
+    grid : array
+        Array of [Nion, L_alpha, L_FUV, L_NUV] as provided by BPASS as a
+        function of metallicity and age.
+    """
     def __init__(self, path, version, imf, popType, dbdtype=_np.float64):
         super().__init__(path, version, imf, popType, "ionizing", dbdtype)
         self._constructGrid(dbdtype)
         self._constructInterpolator()
         return
 
-    def _constructGrid(self, dbdtype):
+    def _constructAges(self):
         # load first file to extract some info
-        fArr = _np.loadtxt(self.flist[0], dtype=dbdtype)
+        fArr = _np.loadtxt(self.flist[0], dtype=self.dbdtype)
 
         self.log_ages = fArr[:, 0][:]
         self._aMin = self.log_ages[0]
         self._aMax = self.log_ages[-1]
+        return
+
+    def _constructGrid(self, dbdtype):
+        # load first file to extract some info
+        fArr = _np.loadtxt(self.flist[0], dtype=dbdtype)
 
         # can now allocate the actual grid
         self.grid = _np.empty(

@@ -1,3 +1,4 @@
+import abc as _abc
 import warnings as _warnings
 import re as _re
 import os as _os
@@ -6,49 +7,76 @@ import numpy as _np
 from scipy import interpolate as _interpolate
 
 
-class BPASSdatabase(object):
+class BPASSdatabase(_abc.ABC):
     """
-    Parameters
-    ----------
-    path : string
-        Path to BPASS data release.
-    version : string
-        Version of the BPASS data release.
-    imf : string
-        Which stellar initial mass function to use.
-    popType : string
-        The population type to use.
+    This class models a database that contains a certain property of stellar
+    populations as a function of age and metallicity. A database instance for a
+    fixed BPASS version is uniquely defined by a property (e.g. 'spectra'), an
+    IMF and a population type (binary or not). This class is abstract and
+    intended to be a base class. Specialized subclasses should be used for each
+    property.
 
     Attributes
     ----------
+    version : string
+        BPASS version this database uses.
     imf : string
-        The IMF of this SED grid.
+        The initial mass function (IMF) this database uses.
     popType : string
-        The population type of this SED grid. Can be single ('sin') or binary
-        ('bin').
-    metallicities : list
+        The population type uses.
+    metallicities : array
         The metallicities at which BPASS provides data for this IMF and
         population type combination. Given as the mass fraction in metals.
-    flist : list
+    log_ages : array
+        log10 of the ages [yr] at which BPASS provides data for this IMF and
+        population type combination.
+    flist : list of strings
         List of files that belong to this database.
+    dbdtype : dtype
+        Data type used by this database.
     """
 
-    def __init__(self, path, version, imf, popType, key, dbdtype):
-        if not _os.path.isdir(path):
-            raise ValueError(path + " is not a directory.")
-        self.path = _os.path.abspath(path)
+    @_abc.abstractmethod
+    def __init__(self, basepath, version, imf, popType, key,
+                 dbdtype=_np.float64):
+        """
+        Parameters
+        ----------
+        basepath : string
+            Path to BPASS data release.
+        version : string
+            Version of the BPASS data release.
+        imf : string
+            Which stellar initial mass function to use.
+        popType : string
+            The population type to use.
+        key : string
+            The stellar population property this database contains.
+        dbdtype : dtype, optional
+            Data type to use for arrays read from disk. Defaults to numpy's
+            float64.
+        """
+        if not _os.path.isdir(basepath):
+            raise ValueError(basepath + " is not a directory.")
         self.version = version
         self.imf = imf
         self.popType = popType
+        self.dbdtype = dbdtype
 
-        # IMF specific subfolder of BPASS data release
-        self.folder = \
-            'bpass_v'+self.version+'_imf'+imf if not imf[0].isalpha() \
-            else 'bpass_v'+self.version+'_imf_'+imf
-        if not _os.path.isdir(_os.path.join(self.path, self.folder)):
-            raise ValueError(_os.path.join(self.path, self.folder) +
+        self._constructFlist(basepath, key)
+        self._constructMetallicities()
+        self._constructAges()
+
+        return
+
+    def _constructFlist(self, basepath, key):
+        # subfolder of basepath for given parameter configuration
+        folder = \
+            'bpass_v'+self.version+'_imf'+self.imf if not self.imf[0].isalpha() \
+            else 'bpass_v'+self.version+'_imf_'+self.imf
+        if not _os.path.isdir(_os.path.join(basepath, folder)):
+            raise ValueError(_os.path.join(self.basepath, folder) +
                              " is not a directory.")
-
         # wildcarded filename to glob for
         reg = \
             key+"-"+self.popType+"-imf"+self.imf+"*" \
@@ -56,20 +84,29 @@ class BPASSdatabase(object):
             else key+"-"+self.popType+"-imf_"+self.imf+"*"
 
         # list of files that comprise our database
-        flist = _glob.glob(_os.path.join(self.path, self.folder, reg))
+        flist = _glob.glob(_os.path.join(basepath, folder, reg))
         flist.sort(
             key=lambda x: self._zFromFilename(_os.path.basename(x))
         )
+        self.flist = flist
+        return
+
+    def _constructMetallicities(self):
         self.metallicities = _np.array([
-            self._zFromFilename(_os.path.basename(x)) for x in flist
-        ], dtype=dbdtype)
+            self._zFromFilename(_os.path.basename(x)) for x in self.flist
+        ], dtype=self.dbdtype)
         if _np.any(_np.diff(self.metallicities) <= 0):
             raise RuntimeError(
-                "Sorting available tables by metallicity failed! "
-                "Found the following values: "+str(self.metallicities))
-        self.flist = flist
+                "Sorting available files by metallicity failed! "
+                "Found the following values: "+str(self.metallicities) +
+                " and the following files: "+str(self.flist)
+            )
         self._zMin = self.metallicities[0]
         self._zMax = self.metallicities[-1]
+        return
+
+    @_abc.abstractmethod
+    def _constructAges(self):
         return
 
     def _zFromFilename(self, fname):

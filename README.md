@@ -46,4 +46,4 @@ pip install -e .
 
 # Tests
 Test can be run by `python setup.py test`. Most of the tests require a local
-database copy. The path can be set in `pyBPASS.test.config`.
+database copy. The path can be set in `pyBPASS.tests.config`.
