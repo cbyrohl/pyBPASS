@@ -1,3 +1,4 @@
+import warnings as _warnings
 import numpy as _np
 from pyBPASS.database import BPASSdatabase as _BPASSdatabase
 
@@ -126,7 +127,8 @@ class BPASSsedDatabase(_BPASSdatabase):
             input stellar population at all wavelengths provided by the
             database.
         """
-        return self.wavelengths, self._interpolate(metallicities, ages, masses)
+        masses = _check_masses(masses)
+        return self.wavelengths, self._interpolate(metallicities, ages)*masses
 
 
 class BPASSionRatesDatabase(_BPASSdatabase):
@@ -209,10 +211,22 @@ class BPASSionRatesDatabase(_BPASSdatabase):
             Interpolated values as specified above for each input stellar
             population.
         """
-        try:
-            # to be able to multiply array of interpolated values by it
-            masses = masses[:, None]
-        except TypeError as e:
-            if 'not subscriptable' not in str(e):
-                raise
-        return masses*10**(self._interpolate(metallicities, ages, 1))
+        masses = _check_masses(masses)
+        return masses*10**(self._interpolate(metallicities, ages))
+
+
+def _check_masses(masses):
+    if _np.amin(masses) < 1e-3:
+        _warnings.warn(
+            "Input masses below 1000 M_sun! For such small populations,"
+            " single stars can contribute a significant fraction of the"
+            " population mass and re-scaling BPASS values averaged over"
+            " more massive populations likely yields incorrect results."
+        )
+    try:
+        # to be able to multiply array of interpolated values by it
+        masses = masses[:, None]
+    except TypeError as e:
+        if 'not subscriptable' not in str(e):
+            raise
+    return masses

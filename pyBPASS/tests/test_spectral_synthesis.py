@@ -242,7 +242,7 @@ class TestBPASSsedDatabase(TestCase):
             len(cm.warnings), 1
         )
         self.assertTrue(
-            'Input metallicities for spectral synthesis outside of available'
+            'Input metallicities for interpolation outside of available'
             in str(cm.warnings[0].message)
         )
         self.assertFalse(

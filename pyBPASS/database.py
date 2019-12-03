@@ -130,19 +130,12 @@ class BPASSdatabase(_abc.ABC):
         )
         return
 
-    def _interpolate(self, metallicities, ages, masses=1):
-        # argument checking
-        try:
-            # to be able to multiply array of interpolated values by it
-            masses = masses[:, None]
-        except TypeError as e:
-            if 'not subscriptable' not in str(e):
-                raise
+    def _interpolate(self, metallicities, ages):
         # clipping
         if _np.amax(metallicities) > self._zMax or \
            _np.amin(metallicities) < self._zMin:
             _warnings.warn(
-                "Input metallicities for spectral synthesis outside of "
+                "Input metallicities for interpolation outside of "
                 "available range "+str(self._zMin)+", "+str(self._zMax) +
                 " provided. They will be clipped."
             )
@@ -154,7 +147,7 @@ class BPASSdatabase(_abc.ABC):
         if _np.amax(ages) > 10**(self._aMax) or \
            _np.amin(ages) < 10**(self._aMin):
             _warnings.warn(
-                "Input ages for spectral synthesis outside of available "
+                "Input ages for interpolation outside of available "
                 "range "+str(10**self._aMin)+", "+str(10**self._aMax) +
                 " [yr] provided. They will be clipped."
             )
@@ -163,11 +156,4 @@ class BPASSdatabase(_abc.ABC):
                 ages, dtype=self.log_ages.dtype
             )
             _np.clip(ages, 10**self._aMin, 10**self._aMax, out=ages)
-        if _np.amin(masses) < 1e-3:
-            _warnings.warn(
-                "Input masses below 1000 M_sun! For such small populations,"
-                " single stars can contribute a significant fraction of the"
-                " population mass and re-scaling BPASS values averaged over"
-                " more massive populations likely yields incorrect results."
-            )
-        return self._interpolator(metallicities, _np.log10(ages))*masses
+        return self._interpolator(metallicities, _np.log10(ages))
