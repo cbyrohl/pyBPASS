@@ -33,6 +33,11 @@ Nion = db.interpolate(metallicities, ages, masses)[:, 0]
 For more information, see docstrings. They should be pretty clear.
 
 # Installation
+`numpy` is required for the installation process itself, not only as
+dependency. So please make sure it is installed (`pip install numpy`) before
+proceeding. As far as I know, there are only hacky ways of bootstrapping
+`numpy` during setup so I decided against implementing any of them.
+
 To install:
 ```sh
 git clone git@gitlab.mpcdf.mpg.de:mglatzle/pybpass.git
