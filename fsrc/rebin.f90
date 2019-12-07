@@ -28,10 +28,10 @@ contains
 
     ! Build rebinned SED.
     do j=1, m
-       w(m) = (bin_edges(j)+bin_edges(j+1))/2
-       z(m) = trapzq_sorted( &
+       w(j) = (bin_edges(j)+bin_edges(j+1))/2
+       z(j) = trapzq_sorted( &
             n,x,y,bin_edges(j),bin_edges(j+1),istart &
-            )/(bin_edges(j)-bin_edges(j+1))
+            )/(bin_edges(j+1)-bin_edges(j))
     enddo
 
   contains
