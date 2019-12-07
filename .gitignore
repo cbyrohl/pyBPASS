@@ -6,3 +6,7 @@
 *.egg-info/*
 .cache/*
 .eggs/*
+# f2py build dir
+build/*
+# f2py modules
+*.so
