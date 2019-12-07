@@ -1,3 +1,12 @@
+# setuptools import here is required to be able to run tests with `python
+# setup.py test`. If I interpret stackoverflow.com/a/41896134/ correctly, this
+# also means that setuptools will be used for the actual installation, even
+# though we use
+# numpy.distutils.setup. [[github.com/wafo-project/pywafo/issues/14][This]]
+# issue on github might provide more insights. I consider how it currently
+# works good enough, though, so will not continue looking into it.
+import setuptools
+
 try:
     import numpy.distutils.core
 except ImportError as e:
