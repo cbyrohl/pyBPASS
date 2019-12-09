@@ -1,6 +1,7 @@
 import warnings as _warnings
 import numpy as _np
 from pyBPASS.database import BPASSdatabase as _BPASSdatabase
+from pyBPASS import _sed_tools
 
 _constants = {
     '2.2.1': {
@@ -230,3 +231,66 @@ def _check_masses(masses):
         if 'not subscriptable' not in str(e):
             raise
     return masses
+
+
+def bin_spectra(wave, spectra, bins, edges=False):
+    """
+    Bin spectra conserving luminosity.
+
+    Given SEDs sampled at certain wavelengths/frequencies will compute their
+    values in given wavelength/frequency bins. The new SED values are bin
+    averages computed using trapezoidal integration. This ensures that the
+    luminosity per bin is conserved. Of course, only downsampling really makes
+    sense here, i.e. the input SEDs should be well sampled compared to the
+    desired output bins.
+
+    Effectively converts input spectra to step functions of
+    wavelength/frequency. Note, in particular, that this means that only
+    rectangle rule integration can sensibly be performed on the output
+    spectra. Higher order integration methods are not meaningful.
+
+    Parameters
+    ----------
+    wave : array, shape `(N_wave)`
+        Wavelengths or frequencies at which spectra are known. Assumed to be
+        sorted in ascending order.
+    spectra : array, shape `(N, N_wave)`
+        The SEDs to resample given as L_lambda [Energy/Time/Wavelength] or L_nu
+        [Energy/Time/Frequency] in accordance with `wave`.
+    bins : array, shape `(N_bins)`
+        The bins to which to resample spectra. Either values in the bins or
+        their edges. See `edges`. Assumed to be sorted in ascending
+        order. Required to lie within the range provided by `wave`.
+    edges : bool, optional
+        Whether the values given in `bins` are bin edges or values in the
+        bins. If `True`, `N_wave_new=N_bins-1`. If `False`, `N_wave_new=N_bins`
+        and in this case bin edges are constructed such that they always lie
+        between neighbouring points. The first/last bin is assumed to be
+        symmetric around the first/last value in bins.
+
+    Returns
+    -------
+    wave_new : array, shape `(N_wave_new)`
+        The wavelength/frequency values to which spectra were binned. If edges
+        is `False`, this will be identical to `bins`. Otherwise it will be the
+        bin centers.
+    spectra_new : array, shape `(N, N_wave_new)`
+        The binned spectra.
+    """
+    if edges:
+        bin_edges = bins
+        wave_new = (bins[1:] + bins[:-1])/2
+    else:
+        wave_new = bins
+        bin_edges = _np.empty((len(bins) + 1))
+        bin_edges[1:-1] = (bins[1:] + bins[:-1])/2
+        bin_edges[0] = bins[1] - (bin_edges[1]-bins[1])
+        bin_edges[-1] = bins[-1] + (bins[-1]-bin_edges[-2])
+    if not _np.alltrue((bin_edges >= wave[0]) & (bin_edges <= wave[-1])):
+        raise ValueError("bin_edges outside of valid range!")
+    spectra_new = _np.empty((spectra.shape[0], len(bin_edges) - 1))
+    for j, spec in enumerate(spectra):
+        _sed_tools.sed_tools.bin_sed(
+            wave, spec, bin_edges, spectra_new[j, :]
+        )
+    return wave_new, spectra_new

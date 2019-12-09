@@ -409,3 +409,43 @@ class TestBPASSionRatesDatabase(TestCase):
             )
         )
         return
+
+
+class TestBin_spectra(TestCase):
+
+    def test_std(self):
+        wave = np.linspace(1, 1000, num=2000)
+        SEDs = np.random.random((100, len(wave)))
+        bins = np.linspace(100, 500, num=10)
+        edges = False
+        wave_new, SEDs_new = spectral_synthesis.bin_spectra(
+            wave, SEDs, bins, edges=edges
+        )
+
+        self.assertTrue(
+            np.allclose(bins, wave_new)
+        )
+        self.assertEqual(
+            (SEDs.shape[0], len(bins)), SEDs_new.shape
+        )
+        return
+
+    def test_L_conservation(self):
+        wave = np.linspace(1, 1000, num=20000, endpoint=True)
+        SEDs = np.random.random((20, len(wave)))
+        bins = np.linspace(1, 1000, num=10, endpoint=True)
+        edges = True
+        wave_new, SEDs_new = spectral_synthesis.bin_spectra(
+            wave, SEDs, bins, edges=edges
+        )
+        self.assertEqual(
+            (SEDs.shape[0], len(bins)-1), SEDs_new.shape
+        )
+
+        self.assertTrue(
+            np.allclose(
+                np.trapz(SEDs, x=wave, axis=1),
+                np.sum(SEDs_new*(bins[1:]-bins[:-1]), axis=1)
+            )
+        )
+        return
