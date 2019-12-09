@@ -1,18 +1,19 @@
-module rebin
+module sed_tools
   use, intrinsic :: iso_fortran_env, only: REAL64
   implicit none
 
 contains
 
-  subroutine rebin_sed(n,m,x,y,bin_edges,z)
-    ! Rebin an SED to new frequency/wavelength values conserving luminosity.
+  subroutine bin_sed(n,m,x,y,bin_edges,z)
+    ! Bin an SED to given frequency/wavelength values conserving luminosity.
     !
-    ! x is nu or lambda assumed to be sorted in ascending order.
+    ! x is nu or lambda at which SED is known, assumed to be sorted in
+    ! ascending order.
     !
     ! y(x) is L_nu or L_lambda.
     !
-    ! bin_edges are the edges of the new bins. Assumed to be sorted in
-    ! ascending order with bin_edges(1) >= x(1) and bin_edges(n) <= x(n).
+    ! bin_edges are the edges of the bins. Assumed to be sorted in ascending
+    ! order with bin_edges(1) >= x(1) and bin_edges(n) <= x(n).
     !
     ! The new L_nu or L_lambda values at each bin are stored in z. These values
     ! are averaged over the bin so as to conserve luminosity. Averages are
@@ -24,7 +25,7 @@ contains
 
     integer :: istart, j
 
-    ! Build rebinned SED.
+    ! Build binned SED.
     do j=1, m
        z(j) = trapzq_sorted( &
             n,x,y,bin_edges(j),bin_edges(j+1),istart &
@@ -109,5 +110,5 @@ contains
          trapzq_sorted = trapzq_sorted+(x(i)-x(i-1))*(y(i)+y(i-1))/2
       enddo
     end function trapzq_sorted
-  end subroutine rebin_sed
-end module rebin
+  end subroutine bin_sed
+end module sed_tools

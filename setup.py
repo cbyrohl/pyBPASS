@@ -18,9 +18,9 @@ except ImportError as e:
     )
 import numpy.distutils.extension
 
-rebin_ext = numpy.distutils.extension.Extension(
-    name="pyBPASS._rebin",
-    sources=["fsrc/rebin.f90"]
+sed_ext = numpy.distutils.extension.Extension(
+    name="pyBPASS._sed_tools",
+    sources=["fsrc/sed_tools.f90"]
 )
 
 with open('README.md') as fh:
@@ -42,5 +42,5 @@ numpy.distutils.core.setup(
     tests_require=[
         'pytest'
     ],
-    ext_modules=[rebin_ext],
+    ext_modules=[sed_ext],
 )
