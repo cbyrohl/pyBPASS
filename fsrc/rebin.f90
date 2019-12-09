@@ -4,7 +4,7 @@ module rebin
 
 contains
 
-  subroutine rebin_sed(n,m,x,y,bin_edges,w,z)
+  subroutine rebin_sed(n,m,x,y,bin_edges,z)
     ! Rebin an SED to new frequency/wavelength values conserving luminosity.
     !
     ! x is nu or lambda assumed to be sorted in ascending order.
@@ -14,21 +14,18 @@ contains
     ! bin_edges are the edges of the new bins. Assumed to be sorted in
     ! ascending order with bin_edges(1) >= x(1) and bin_edges(n) <= x(n).
     !
-    ! The new nu or lambda values (bin centers) are stored in w.
-    !
-    ! The new L_nu or L_lambda values at the bin centers are stored in z.
-    ! These values are averaged over the bin so as to conserve luminosity.
-    ! Averages are computed using trapezoidal integration.
+    ! The new L_nu or L_lambda values at each bin are stored in z. These values
+    ! are averaged over the bin so as to conserve luminosity. Averages are
+    ! computed using trapezoidal integration.
     integer     , intent(in) :: n, m
     real(REAL64), intent(in) :: x(n), y(n), bin_edges(m+1)
 
-    real(REAL64), intent(inout) :: w(m), z(m)
+    real(REAL64), intent(inout) :: z(m)
 
     integer :: istart, j
 
     ! Build rebinned SED.
     do j=1, m
-       w(j) = (bin_edges(j)+bin_edges(j+1))/2
        z(j) = trapzq_sorted( &
             n,x,y,bin_edges(j),bin_edges(j+1),istart &
             )/(bin_edges(j+1)-bin_edges(j))
