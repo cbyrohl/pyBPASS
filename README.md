@@ -17,7 +17,7 @@ popType = 'bin'
 db = BPASSsedDatabase(path, version, imf, popType)
 
 
-wavlengths, seds = db.interpolate(metallicities, ages, masses)
+wavelengths, seds = db.interpolate(metallicities, ages, masses)
 ```
 
 Similarly, to compute e.g. the emission rate of ionizing photons for the above
@@ -28,6 +28,13 @@ from pyBPASS.spectral_synthesis import BPASSionRatesDatabase
 db = BPASSionRatesDatabase(path, version, imf, popType)
 
 Nion = db.interpolate(metallicities, ages, masses)[:, 0]
+```
+
+To bin spectra (e.g. for use in a radiative transfer code):
+```python
+from pyBPASS.spectral_synthesis import bin_spectra
+
+wave_new, seds_new = bin_spectra(wavelengths, seds, bins)
 ```
 
 For more information, see docstrings. They should be pretty clear.
@@ -50,5 +57,5 @@ pip install -e .
 ```
 
 # Tests
-Test can be run by `python setup.py test`. Most of the tests require a local
+Tests can be run by `python setup.py test`. Most of them require a local
 database copy. The path can be set in `pyBPASS.tests.config`.
