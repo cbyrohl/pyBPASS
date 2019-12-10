@@ -284,7 +284,7 @@ def bin_spectra(wave, spectra, bins, edges=False):
         wave_new = bins
         bin_edges = _np.empty((len(bins) + 1))
         bin_edges[1:-1] = (bins[1:] + bins[:-1])/2
-        bin_edges[0] = bins[1] - (bin_edges[1]-bins[1])
+        bin_edges[0] = bins[0] - (bin_edges[1]-bins[0])
         bin_edges[-1] = bins[-1] + (bins[-1]-bin_edges[-2])
     if not _np.alltrue((bin_edges >= wave[0]) & (bin_edges <= wave[-1])):
         raise ValueError("bin_edges outside of valid range!")

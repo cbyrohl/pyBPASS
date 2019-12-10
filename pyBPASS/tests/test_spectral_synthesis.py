@@ -415,8 +415,8 @@ class TestBin_spectra(TestCase):
 
     def test_std(self):
         wave = np.linspace(1, 1000, num=2000)
-        SEDs = np.random.random((100, len(wave)))
-        bins = np.linspace(100, 500, num=10)
+        SEDs = np.random.random((10, len(wave)))
+        bins = np.linspace(100, 500, num=5)
         edges = False
         wave_new, SEDs_new = spectral_synthesis.bin_spectra(
             wave, SEDs, bins, edges=edges
@@ -427,6 +427,9 @@ class TestBin_spectra(TestCase):
         )
         self.assertEqual(
             (SEDs.shape[0], len(bins)), SEDs_new.shape
+        )
+        self.assertTrue(
+            np.all(SEDs_new >= 0)
         )
         return
 
@@ -441,7 +444,9 @@ class TestBin_spectra(TestCase):
         self.assertEqual(
             (SEDs.shape[0], len(bins)-1), SEDs_new.shape
         )
-
+        self.assertTrue(
+            np.all(SEDs_new >= 0)
+        )
         self.assertTrue(
             np.allclose(
                 np.trapz(SEDs, x=wave, axis=1),
