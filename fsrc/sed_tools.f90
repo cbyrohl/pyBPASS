@@ -31,6 +31,8 @@ contains
 
     integer :: istart, j
 
+    istart = 1
+
     ! Build binned SED.
     do j=1, m
        z(j) = trapzq_sorted( &
@@ -49,7 +51,7 @@ contains
       ! x1 and x2 must fulfill >=x(1) and <=x(n). Moreover, x1<=x2 must hold.
       !
       ! Starts search for x1 at istart if provided and if x1>=x(istart), else
-      ! at one.
+      ! at one. Sets istart to the last index at which x<=x2.
       integer     , intent(in) :: n
       real(REAL64), intent(in) :: x(n), y(n), x1, x2
 
@@ -115,6 +117,10 @@ contains
       do i=i1+1, i2
          trapzq_sorted = trapzq_sorted+(x(i)-x(i-1))*(y(i)+y(i-1))/2
       enddo
+
+      if(present(istart)) then
+         istart = i2
+      endif
     end function trapzq_sorted
   end subroutine bin_sed
 end module sed_tools
