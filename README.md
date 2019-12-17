@@ -49,7 +49,7 @@ proceeding. As far as I know, there are only hacky ways of bootstrapping
 
 To install:
 ```sh
-git clone git@gitlab.mpcdf.mpg.de:mglatzle/pybpass.git
+git clone https://gitlab.mpcdf.mpg.de:mglatzle/pybpass.git
 cd pyBPASS
 pip install .
 ```
