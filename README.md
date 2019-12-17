@@ -1,5 +1,7 @@
-Tools for interaction with BPASS data releases. Implemented on DR 2.2.1 so they
-might have to be slightly modified for other versions.
+Tools for interaction with [BPASS](https://bpass.auckland.ac.nz/9.html) data
+releases. Implemented on [DR
+2.2.1](https://drive.google.com/drive/folders/1BS2w9hpdaJeul6-YtZum--F4gxWIPYXl)
+so they might have to be slightly modified for other versions.
 
 # Spectral synthesis
 To compute SEDs for stellar populations the mass, metallicity and age of which
@@ -20,14 +22,14 @@ db = BPASSsedDatabase(path, version, imf, popType)
 wavelengths, seds = db.interpolate(metallicities, ages, masses)
 ```
 
-Similarly, to compute e.g. the emission rate of ionizing photons for the above
+Similarly, to compute the emission rates of photons in different bands for the above
 stellar populations:
 ```python
 from pyBPASS.spectral_synthesis import BPASSionRatesDatabase
 
 db = BPASSionRatesDatabase(path, version, imf, popType)
 
-Nion = db.interpolate(metallicities, ages, masses)[:, 0]
+Nion = db.interpolate(metallicities, ages, masses)
 ```
 
 To bin spectra (e.g. for use in a radiative transfer code):

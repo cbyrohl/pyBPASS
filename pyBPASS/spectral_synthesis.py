@@ -124,9 +124,8 @@ class BPASSsedDatabase(_BPASSdatabase):
          : array, shape `(N_lam)`
             Array of wavelengths [angstrom] provided by the database.
          : array, shape `(N, N_lam)`
-            Interpolated SED [L_sun/angstrom] normalized to 1e6 M_sun for each
-            input stellar population at all wavelengths provided by the
-            database.
+            Interpolated SED [L_sun/angstrom] for each input stellar population
+            at all wavelengths provided by the database.
         """
         masses = _check_masses(masses)
         return self.wavelengths, self._interpolate(metallicities, ages)*masses
