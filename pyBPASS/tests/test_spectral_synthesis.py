@@ -19,18 +19,19 @@ class TestBPASSsedDatabase(TestCase):
     def setUpClass(cls):
         cls.path = config.BPASSpath
         cls.version = "2.2.1"
-        cls.bin_chab300_z040 = np.loadtxt(
-            os.path.join(
-                cls.path,
-                "bpass_v2.2.1_imf_chab300/spectra-bin-imf_chab300.z040.dat.gz"
-            )
-        )
-        cls.bin_chab300_z030 = np.loadtxt(
-            os.path.join(
-                cls.path,
-                "bpass_v2.2.1_imf_chab300/spectra-bin-imf_chab300.z030.dat.gz"
-            )
-        )
+
+        bpath = os.path.join(cls.path, "bpass_v2.2.1_imf_chab300")
+
+        path = os.path.join(bpath, "spectra-bin-imf_chab300.z040.dat.gz")
+        if not os.path.isfile(path):
+            path = path.rstrip(".gz")
+        cls.bin_chab300_z040 = np.loadtxt(path)
+
+        path = os.path.join(bpath, "spectra-bin-imf_chab300.z030.dat.gz")
+        if not os.path.isfile(path):
+            path = path.rstrip(".gz")
+        cls.bin_chab300_z030 = np.loadtxt(path)
+
         cls.db_chab300_bin = spectral_synthesis.BPASSsedDatabase(
             cls.path,
             cls.version,
@@ -302,24 +303,23 @@ class TestBPASSionRatesDatabase(TestCase):
             "chab300",
             "bin"
         )
-        cls.bin_chab300_z040 = np.loadtxt(
-            os.path.join(
-                cls.path,
-                "bpass_v2.2.1_imf_chab300/ionizing-bin-imf_chab300.z040.dat.gz"
-            )
-        )
-        cls.bin_chab300_z030 = np.loadtxt(
-            os.path.join(
-                cls.path,
-                "bpass_v2.2.1_imf_chab300/ionizing-bin-imf_chab300.z030.dat.gz"
-            )
-        )
-        cls.bin_chab300_z020 = np.loadtxt(
-            os.path.join(
-                cls.path,
-                "bpass_v2.2.1_imf_chab300/ionizing-bin-imf_chab300.z020.dat.gz"
-            )
-        )
+
+        bpath = os.path.join(cls.path, "bpass_v2.2.1_imf_chab300")
+
+        path = os.path.join(bpath, "ionizing-bin-imf_chab300.z040.dat.gz")
+        if not os.path.isfile(path):
+            path = path.rstrip(".gz")
+        cls.bin_chab300_z040 = np.loadtxt(path)
+
+        path = os.path.join(bpath, "ionizing-bin-imf_chab300.z030.dat.gz")
+        if not os.path.isfile(path):
+            path = path.rstrip(".gz")
+        cls.bin_chab300_z030 = np.loadtxt(path)
+
+        path = os.path.join(bpath, "ionizing-bin-imf_chab300.z020.dat.gz")
+        if not os.path.isfile(path):
+            path = path.rstrip(".gz")
+        cls.bin_chab300_z020 = np.loadtxt(path)
 
     def test_interpolate_array(self):
         db = self.__class__.db_chab300_bin
