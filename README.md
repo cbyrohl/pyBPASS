@@ -58,6 +58,10 @@ If you want to install in `develop` mode instead:
 pip install -e .
 ```
 
+Then download all `bpass_v2.2.1_*.tar.gz` files to a folder of your choice and
+extract them there. To get started, replace `path-to-BPASS-data-release` in the
+above examples with the path to your folder.
+
 # Tests
 Tests can be run by `python setup.py test`. Most of them require a local
 database copy. The path can be set in `pyBPASS.tests.config`.
