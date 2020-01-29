@@ -292,12 +292,12 @@ class TestBPASSsedDatabase(TestCase):
         return
 
 
-class TestBPASSionRatesDatabase(TestCase):
+class TestBPASSemRatesDatabase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.path = config.BPASSpath
         cls.version = "2.2.1"
-        cls.db_chab300_bin = spectral_synthesis.BPASSionRatesDatabase(
+        cls.db_chab300_bin = spectral_synthesis.BPASSemRatesDatabase(
             cls.path,
             cls.version,
             "chab300",

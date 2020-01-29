@@ -131,7 +131,7 @@ class BPASSsedDatabase(_BPASSdatabase):
         return self.wavelengths, self._interpolate(metallicities, ages)*masses
 
 
-class BPASSionRatesDatabase(_BPASSdatabase):
+class BPASSemRatesDatabase(_BPASSdatabase):
     """
     This class models a database for different emissivities as a function of
     metallicity and age of stellar populations for fixed IMF and population

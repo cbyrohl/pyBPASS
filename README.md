@@ -25,11 +25,11 @@ wavelengths, seds = db.interpolate(metallicities, ages, masses)
 Similarly, to compute the emission rates of photons in different bands for the above
 stellar populations:
 ```python
-from pyBPASS.spectral_synthesis import BPASSionRatesDatabase
+from pyBPASS.spectral_synthesis import BPASSemRatesDatabase
 
-db = BPASSionRatesDatabase(path, version, imf, popType)
+db = BPASSemRatesDatabase(path, version, imf, popType)
 
-Nion = db.interpolate(metallicities, ages, masses)
+dotN = db.interpolate(metallicities, ages, masses)
 ```
 
 To bin spectra (e.g. for use in a radiative transfer code):
