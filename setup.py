@@ -28,7 +28,7 @@ with open('README.md') as fh:
 
 numpy.distutils.core.setup(
     name='pyBPASS',
-    version='1.0.3',
+    version='1.1.0',
     author_email='mglatzle@mpa-garching.mpg.de',
     description='Python tools for BPASS data releases.',
     long_description=long_desc,
