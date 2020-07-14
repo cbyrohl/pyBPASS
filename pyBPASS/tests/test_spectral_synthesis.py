@@ -291,6 +291,25 @@ class TestBPASSsedDatabase(TestCase):
         )
         return
 
+    def test_em_decline(self):
+        """
+        Expect ionizing emissivity to do down with age.
+        """
+        db_cut = self.__class__.db_chab300_bin_lam_cut
+
+        Z = 0.040
+
+        age = 1e6
+        _, sed_young = db_cut.interpolate(Z, age)
+
+        age = 1e11
+        _, sed_old = db_cut.interpolate(Z, age)
+
+        self.assertTrue(
+            np.all(sed_young > sed_old)
+        )
+        return
+
 
 class TestBPASSemRatesDatabase(TestCase):
     @classmethod
@@ -407,6 +426,29 @@ class TestBPASSemRatesDatabase(TestCase):
                 ),
                 atol=0.0
             )
+        )
+        return
+
+    def test_Q_0_decline(self):
+        """
+        Expect Q_0 to go down as stars get older.
+        """
+        db = self.__class__.db_chab300_bin
+
+        Z = 1.0
+        with self.assertWarns(UserWarning):
+            young = db.interpolate(Z, 0)
+            old = db.interpolate(Z, 1e9)
+        self.assertTrue(
+            np.all(young > old)
+        )
+
+        Z = 0.0
+        with self.assertWarns(UserWarning):
+            young = db.interpolate(Z, 0)
+            old = db.interpolate(Z, 1e9)
+        self.assertTrue(
+            np.all(young > old)
         )
         return
 
