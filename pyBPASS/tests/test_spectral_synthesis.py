@@ -143,15 +143,20 @@ class TestBPASSsedDatabase(TestCase):
         self.assertTrue(
             np.all(lam == self.__class__.bin_chab300_z040[:, 0])
         )
+        # Delaunay triangulation is not unique for regular grid, can in
+        # principle get two answers
+        opt1 = 0.5*(
+            self.__class__.bin_chab300_z040[:, 1] +
+            self.__class__.bin_chab300_z030[:, 2]
+        )
+        opt2 = 0.5*(
+            self.__class__.bin_chab300_z040[:, 2] +
+            self.__class__.bin_chab300_z030[:, 1]
+        )
         self.assertTrue(
-            np.allclose(
-                sed,
-                0.5*(
-                    self.__class__.bin_chab300_z040[:, 1] +
-                    self.__class__.bin_chab300_z030[:, 2]
-                ),
-                atol=0.0
-            )
+            np.allclose(sed, opt1, atol=0.0)
+            or
+            np.allclose(sed, opt2, atol=0.0)
         )
         return
 
@@ -395,38 +400,55 @@ class TestBPASSemRatesDatabase(TestCase):
         )
 
         # between four points
-        z = 0.035
-        age = 10**6.05
-        res = db.interpolate(z, age)
-        self.assertTrue(
-            np.allclose(
-                res,
-                10**(
-                    0.5*(
-                        self.__class__.bin_chab300_z040[0, 1:] +
-                        self.__class__.bin_chab300_z030[1, 1:]
-                    )
-                ),
-                atol=0.0
-            )
-        )
-
-        # between four points
         z = 0.025
         age = 10**6.15
         res = db.interpolate(z, age)
-        self.assertTrue(
-            np.allclose(
-                res,
-                10**(
-                    0.5*(
-                        self.__class__.bin_chab300_z020[1, 1:] +
-                        self.__class__.bin_chab300_z030[2, 1:]
-                    )
-                ),
-                atol=0.0
+        # Delaunay triangulation is not unique for regular grid, can in
+        # principle get two answers
+        opt1 = 10**(
+            0.5*(
+                self.__class__.bin_chab300_z020[1, 1:] +
+                self.__class__.bin_chab300_z030[2, 1:]
             )
         )
+        opt2 = 10**(
+            0.5*(
+                self.__class__.bin_chab300_z020[2, 1:] +
+                self.__class__.bin_chab300_z030[1, 1:]
+            )
+        )
+
+        self.assertTrue(
+            np.allclose(res, opt1, atol=0.0)
+            or
+            np.allclose(res, opt2, atol=0.0)
+        )
+
+        # between four points
+        z = 0.035
+        age = 10**6.05
+        res = db.interpolate(z, age)
+        # Delaunay triangulation is not unique for regular grid, can in
+        # principle get two answers
+        opt1 =             10**(
+            0.5*(
+                self.__class__.bin_chab300_z030[1, 1:] +
+                self.__class__.bin_chab300_z040[0, 1:]
+            )
+        )
+        opt2 = 10**(
+            0.5*(
+                self.__class__.bin_chab300_z030[0, 1:] +
+                self.__class__.bin_chab300_z040[1, 1:]
+            )
+        )
+
+        self.assertTrue(
+            np.allclose(res, opt1, atol=0.0)
+            or
+            np.allclose(res, opt2, atol=0.0)
+        )
+
         return
 
     def test_Q_0_decline(self):
