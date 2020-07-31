@@ -180,7 +180,7 @@ class BPASSemRatesDatabase(_BPASSdatabase):
 
     def interpolate(self, metallicities, ages, masses=1):
         """
-        Interpolate ionizing photon rates for stellar populations.
+        Interpolate emission rates for stellar populations.
 
         Computes:
             Nion in 1/s:
