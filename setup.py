@@ -40,7 +40,8 @@ numpy.distutils.core.setup(
         'scipy',
     ],
     tests_require=[
-        'pytest'
+        'pytest',
+        'ddt'
     ],
     ext_modules=[sed_ext],
 )
