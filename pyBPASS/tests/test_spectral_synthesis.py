@@ -4,7 +4,7 @@ data releases it is supposed to work with.
 """
 
 from unittest import TestCase
-from .. import spectral_synthesis
+from pyBPASS import spectral_synthesis
 from . import config
 from ddt import ddt, data, unpack
 import numpy as np

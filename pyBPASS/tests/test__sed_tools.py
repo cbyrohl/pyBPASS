@@ -2,7 +2,7 @@
 Tests for _sed_tools Fortran extension module.
 """
 from unittest import TestCase
-from .. import _sed_tools
+from pyBPASS import _sed_tools
 import numpy as np
 
 
