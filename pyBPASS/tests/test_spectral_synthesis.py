@@ -9,7 +9,6 @@ from . import config
 from ddt import ddt, data, unpack
 import numpy as np
 import os
-import astropy.units as u
 
 
 @ddt
@@ -39,12 +38,10 @@ class TestBPASSsedDatabase(TestCase):
             "bin"
         )
 
-        cls.lam_min = (
-            (200*u.eV).to(u.angstrom, equivalencies=u.spectral())
-        ).value
-        cls.lam_max = (
-            (13.6*u.eV).to(u.angstrom, equivalencies=u.spectral())
-        ).value
+        # 200 eV in angstrom
+        cls.lam_min = 61.99209922
+        # 13.6 eV in angstrom
+        cls.lam_max = 911.64851789
         cls.db_chab300_bin_lam_cut = spectral_synthesis.BPASSsedDatabase(
             cls.path,
             cls.version,
