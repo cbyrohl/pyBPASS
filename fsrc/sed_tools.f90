@@ -92,7 +92,7 @@ contains
          ! Have only area from x1 to x2.
          trapzq_sorted = (x2-x1)*(y1+y2)/2
       else
-         ! Add area from x1 to x(i1+1).
+         ! Area from x1 to x(i1+1).
          trapzq_sorted = (x(i1+1)-x1)*(y1+y(i1+1))/2
          ! Add area from x(i1+1) to x(i2-1).
          do i=i1+1, i2-1
