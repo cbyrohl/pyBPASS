@@ -70,13 +70,14 @@ class BPASSdatabase(_abc.ABC):
         return
 
     def _constructFlist(self, basepath, key):
-        # subfolder of basepath for given parameter configuration
-        folder = \
-            'bpass_v'+self.version+'_imf'+self.imf if not self.imf[0].isalpha() \
+        # folder containing files for given parameter configuration
+        folder = _os.path.join(
+            basepath,
+            'bpass_v'+self.version+'_imf'+self.imf if not self.imf[0].isalpha()
             else 'bpass_v'+self.version+'_imf_'+self.imf
-        if not _os.path.isdir(_os.path.join(basepath, folder)):
-            raise ValueError(_os.path.join(self.basepath, folder) +
-                             " is not a directory.")
+        )
+        if not _os.path.isdir(folder):
+            raise ValueError(f"{folder} is not a directory.")
         # wildcarded filename to glob for
         reg = \
             key+"-"+self.popType+"-imf"+self.imf+"*" \
@@ -84,7 +85,7 @@ class BPASSdatabase(_abc.ABC):
             else key+"-"+self.popType+"-imf_"+self.imf+"*"
 
         # list of files that comprise our database
-        flist = _glob.glob(_os.path.join(basepath, folder, reg))
+        flist = _glob.glob(_os.path.join(folder, reg))
         flist.sort(
             key=lambda x: self._zFromFilename(_os.path.basename(x))
         )
