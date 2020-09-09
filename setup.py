@@ -39,6 +39,7 @@ numpy.distutils.core.setup(
         'numpy',
         'scipy',
     ],
+    python_requires='>=3.6',
     tests_require=[
         'pytest',
         'ddt'
