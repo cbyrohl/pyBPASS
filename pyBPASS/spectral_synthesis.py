@@ -140,7 +140,7 @@ class BPASSemRatesDatabase(_BPASSdatabase):
     Attributes
     ----------
     grid : array
-        Array of [Nion, L_alpha, L_FUV, L_NUV] as provided by BPASS as a
+        Array of [Nion, L_Halpha, L_FUV, L_NUV] as provided by BPASS as a
         function of metallicity and age.
     """
     def __init__(self, path, version, imf, popType, dbdtype=_np.float64):
@@ -185,7 +185,7 @@ class BPASSemRatesDatabase(_BPASSdatabase):
         Computes:
             Nion in 1/s:
                 ionizing photon production rate
-            L_alpha in ergs/s:
+            L_Halpha in ergs/s:
                 Balmer H line luminosity, assuming =log(Nion/s)-11.87
             L_FUV in ergs/s/A:
                 luminosity in the FUV band (mean flux from 1556 to 1576A)
