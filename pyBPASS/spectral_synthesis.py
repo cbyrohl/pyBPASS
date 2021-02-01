@@ -274,7 +274,7 @@ def bin_spectra(wave, spectra, bins, edges=False):
         is `False`, this will be identical to `bins`. Otherwise it will be the
         bin centers.
     spectra_new : array, shape `(N, N_wave_new)`
-        The binned spectra.
+        The binned spectra with the same units as the input spectra.
     """
     if edges:
         bin_edges = bins
