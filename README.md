@@ -1,3 +1,8 @@
+*NOTE:* pyBPASS' functionality is being
+[merged](https://github.com/HeloiseS/hoki/pull/46) into
+[hoki](https://github.com/HeloiseS/hoki), from where it should be used in the
+future.
+
 Tools for interaction with [BPASS](https://bpass.auckland.ac.nz/9.html) data
 releases. Implemented on [DR
 2.2.1](https://drive.google.com/drive/folders/1BS2w9hpdaJeul6-YtZum--F4gxWIPYXl)
