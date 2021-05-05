@@ -471,6 +471,18 @@ class TestBPASSemRatesDatabase(TestCase):
         )
         return
 
+    def test_masses(self):
+        """
+        Test mass scaling behaviour.
+        """
+        db = self.__class__.db_chab300_bin
+        res1 = db.interpolate(0.01, 10**6.3, 1)
+        res2 = db.interpolate(0.01, 10**6.3, 2)
+        self.assertTrue(np.allclose(2*res1, res2))
+        res = db.interpolate(0.01*np.ones(2), 3e6*np.ones(2), np.array([1, 2]))
+        self.assertTrue(np.allclose(2*res[0, :], res[1, :]))
+        return
+
 
 class TestBin_spectra(TestCase):
 
