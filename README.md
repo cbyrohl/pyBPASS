@@ -1,7 +1,7 @@
 *NOTE:* pyBPASS' functionality is being
 [merged](https://github.com/HeloiseS/hoki/pull/46) into
 [hoki](https://github.com/HeloiseS/hoki), from where it should be used in the
-future.
+future. Still not merged (2023).
 
 Tools for interaction with [BPASS](https://bpass.auckland.ac.nz/9.html) data
 releases. Implemented on [DR
@@ -54,7 +54,7 @@ proceeding. As far as I know, there are only hacky ways of bootstrapping
 
 To install:
 ```sh
-git clone https://gitlab.mpcdf.mpg.de/mglatzle/pybpass.git
+git clone https://github.com/cbyrohl/pyBPASS.git
 cd pyBPASS
 pip install .
 ```
