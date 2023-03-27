@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "pyBPASS"
+version = "1.2.5"
+description = "Python tools for BPASS data releases."
+authors = ["Martin Glatzle <mglatzle@mpa-garching.mpg.de>", "Chris Byrohl <chris.byrohl@uni-heidelberg.de>"]
+readme = "README.md"
+packages = [{include = "pyBPASS"}]
+license = "GPL-3.0"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+numpy = ">1.22.0"
+
+[tool.poetry.build]
+script = "build.py"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

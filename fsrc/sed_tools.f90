@@ -2,7 +2,7 @@ module sed_tools
   ! Fortran tools for working with Spectral Energy Distributions (SEDs).
   !
   ! This code is in parts inspired by the code distributed alongside GALAXEV
-  ! (Bruzual & Charlot, Mon.Not.R.Astron.Soc.344,1000–1028, 2003).
+  ! (Bruzual & Charlot, Mon.Not.R.Astron.Soc.344,1000-1028, 2003).
   !
   ! Martin Glatzle, mglatzle@mpa-garching.mpg.de, 2019
   use, intrinsic :: iso_fortran_env, only: REAL64
